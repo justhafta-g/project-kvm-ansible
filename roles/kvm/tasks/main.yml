@@ -1,0 +1,6 @@
+---
+# tasks file for kvm
+- name: include kvm debian
+  import_tasks: debian.yml
+  tags:
+    - kvm

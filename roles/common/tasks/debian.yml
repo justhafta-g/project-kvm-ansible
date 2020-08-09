@@ -1,0 +1,41 @@
+---
+- name: dpkg --configure -a
+  shell: dpkg --configure -a
+  become: true
+  tags:
+    - packages
+    - common
+    - dpkg-reconf
+
+- name: install system utils, packages
+  become: true 
+  package:
+    name:
+      - apt-transport-https
+      - curl
+      - figlet
+      - genisoimage
+      - git
+      - git-core
+      - goaccess
+      - htop
+      - libfontconfig
+      - libjson-xs-perl
+      - multitail
+      - ntp
+      - openssl
+      - python-pip
+      - rsync
+      - rsyslog
+      - software-properties-common
+      - vim
+      - vim-common
+      - wget
+      - zip
+    state: latest
+    update_cache: yes
+    cache_valid_time: 5400
+    allow_unauthenticated: yes
+  tags:
+    - packages
+    - common
