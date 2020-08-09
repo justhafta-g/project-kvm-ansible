@@ -5,3 +5,4 @@
   roles:
     - { role: common,               tags: [ 'common'  ] }
     - { role: kvm,               tags: [ 'kvm'  ] }
+    - { role: kvm,               tags: [ 'vdeploy'  ] }

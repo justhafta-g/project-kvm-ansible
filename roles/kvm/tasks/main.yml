@@ -4,3 +4,8 @@
   import_tasks: debian.yml
   tags:
     - kvm
+
+- name: include kvm vdeploy
+  import_tasks: vdeploy.yml
+  tags:
+    - vdeploy

@@ -1,0 +1,21 @@
+---
+- name: check if ubuntu cloud image exist 
+  stat: path={{ image_base_dir }}{{ image_base_name }}.img
+  register: image_base_stat  
+
+- name: get ubuntu cloud image if not exist 
+  command: wget {{ image_base_url }} {{ image_base_dir }}
+  when: image_base_stat.stat.exists == false
+
+
+- name: get copy of original image
+  stat: path="{{ image_base_dir }}{{ image_base_name }}"
+  register: image_base_name_stat  
+
+- name: rename exist base image
+  command: mv {{ image_base_dir }}{{ image_base_name }}.img {{ image_base_dir }}{{ image_custom_name }}.qcow2
+  when: image_base_name_stat.stat.exists
+
+
+
+            

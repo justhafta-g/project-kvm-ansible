@@ -17,6 +17,7 @@
       - virt-top
       - virtinst
       - cloud-init
+      - cloud-image-utils
     state: latest
     update_cache: yes
     cache_valid_time: 5400
