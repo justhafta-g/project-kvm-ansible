@@ -5,7 +5,12 @@
   tags:
     - kvm
 
-- name: include kvm vdeploy
-  import_tasks: vdeploy.yml
+- name: include kvm vm predeploy
+  import_tasks: vm_predeploy.yml
   tags:
-    - vdeploy
+    - vm_predeploy
+
+- name: vm01 deploy
+  import_tasks: vm01_deploy.yml
+  tags:
+    - vm01_deploy

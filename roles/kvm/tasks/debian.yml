@@ -1,5 +1,5 @@
 ---
-- name: install kvm packages on Debian
+- name: install kvm packages on host 
   package:
     name:
       - bridge-utils
@@ -10,14 +10,19 @@
       - libvirt-clients
       - libvirt-daemon-system
       - libvirt-dev
+      - libvirt-bin
       - python-lxml
       - python3-libvirt
       - qemu-kvm
       - qemu-utils
+      - qemu
       - virt-top
       - virtinst
       - cloud-init
       - cloud-image-utils
+      - qemu-system-x86
+      - cpu-checker
+      - virt-viewer
     state: latest
     update_cache: yes
     cache_valid_time: 5400
@@ -29,6 +34,7 @@
 
 #checking libvirt demon
 - name: Enable service libvirt, and start if not started
+  become: true
   service:
     name: libvirtd
     enabled: yes
@@ -52,18 +58,20 @@
 
 #checks if the pool is already created
 - name: create a image_pool_dir
+  become: true 
   file:
     path: "{{ image_pool_dir }}"
     owner: "{{ ansible_user }}"
     group: libvirt
     recurse: yes
     mode: '0755'
-  become: true
+
 
 #create dir for storing libvirt images, ignores it if it’s already there
-- name: add a storage pool for storing libvirt images if Pool doesn't already exists
+- name: add a storage pool for storing libvirt images 
+  become: true
   virt_pool:
-    command: info
+    command: define
     name: "{{ image_pool_name }}"
     xml: '{{ lookup("template", "pool/dir.xml.j2") }}'
     uri: "{{ libvirt_uri }}"
@@ -71,27 +79,39 @@
 
 #building the image pool and starting the image pool, if needed 
 - block:
+  - name:  check domain
+    command: ls /var/lib/libvirt/
+    register: dom_exists
+
   - name: build the storage pool
+    become: true
     virt_pool:
       command: build
+      state: active
       name: "{{ image_pool_name }}"
       uri: "{{ libvirt_uri }}"
+    #when: ansible_libvirt_pools["{{image_pool_name}}"].state != "active"
 
-  - name: start the storage pool
-    virt_pool:
-      command: create
-      name: "{{ image_pool_name }}"
-      uri: "{{ libvirt_uri }}"
-  when: ansible_libvirt_pools["{{ image_pool_name }}"].state != "active"
+   # virt_pool:
+    #  command: create
+     # state: active
+     # name: "{{ image_pool_name }}"
+     # uri: "{{ libvirt_uri }}"
+    #when: ansible_libvirt_pools["{{image_pool_name}}"].state != "active"
+ 
+    
   
   #seting the image pool to autostart and ensure that the image pool is active
 - name: autostart the storage pool
+  become: true
   virt_pool:
     autostart: yes      
     name: "{{ image_pool_name }}"
     uri: "{{ libvirt_uri }}"
+  when: images not in dom_exists
 
 - name: ensure that the pool is active
+  become: true
   virt_pool:
     state: active
     name: "{{ image_pool_name }}"

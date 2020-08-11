@@ -1,5 +1,5 @@
 [kvm]
-kvm01 ansible_host=192.168.1.239 ansible_user=debian
+kvm01 ansible_host=192.168.1.239 ansible_user=ubuntu
 
 [control]
 control ansible_connection=local 

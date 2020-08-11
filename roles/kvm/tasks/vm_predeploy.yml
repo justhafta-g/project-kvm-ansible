@@ -1,0 +1,93 @@
+---
+- name: check if ubuntu cloud image exist 
+  stat: path={{ image_base_dir }}{{ image_base_name }}
+  register: image_base_stat  
+
+- name: get ubuntu cloud image if not exist 
+  become: true
+  get_url:
+    url: "https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img"
+    dest: "{{ image_base_dir }}"
+  when: image_base_stat.stat.exists == false
+
+- name: get copy of original image
+  stat: path=/var/lib/libvirt/images/snapshot-{{image_custom_name}}.qcow2
+  register: image_base_name_stat  
+
+- name: rename exist base image
+  command: qemu-img create -b /var/lib/libvirt/images/bionic-server-cloudimg-amd64.img -f qcow2 /var/lib/libvirt/images/snapshot-{{image_custom_name}}.qcow2 5G
+  when: image_base_name_stat.stat.exists == false
+
+#cheking forward state 
+- name: get info about forward state 
+  command: cat /proc/sys/net/ipv4/ip_forward
+  register: forward_state  
+
+- name: setiing forward state on host
+  command: sudo sysctl -w net.ipv4.ip_forward=1
+  when: forward_state == 0
+
+#check folders for vms
+- name: check folders for vms
+  stat: path="{{ item }}"
+  register: vm_folder_stat
+  #with_dict: "{{ guests }}"
+  with_items: 
+  - "{{ vm_folders }}"
+
+- name: create folders for vms if not exist
+  file:  
+    path: "{{ item.item }}"
+    state: directory 
+  when: item.stat.exists == false
+  #with_dict: "{{ guests }}"  
+  with_items: 
+  - "{{ vm_folder_stat.results }}" 
+
+- name: template a file to vms folders
+  become: true
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items: 
+     - { src: 'templates/vm01_cloud-config.yml.j2', dest: "/var/lib/libvirt/images/vm01/cloud_init.cfg" }
+     - { src: 'templates/vm01_network-config.yml.j2', dest: "/var/lib/libvirt/images/vm01/network_config_static.cfg" }
+
+- name: copy images to vms folders 
+  copy: 
+    src: "{{ image_base_dir }}snapshot-{{ image_custom_name }}.qcow2"
+    dest: "{{ item }}"
+    force: no
+    remote_src: yes
+  with_items:
+    - "{{ vm_images }}"
+
+- name: gather info
+  become: true 
+  virt_net:
+      command: info
+      uri: "{{ libvirt_uri }}"
+  register: networks
+
+#- name: define a network 
+#  virt_net:
+#    command: define
+#    name: test
+#    xml: '{{ lookup("template", "pool/net.xml.j2") }}'
+#    uri: "{{ libvirt_uri }}"
+
+#building the image pool and starting the image pool, if needed 
+#- name: build network
+#  virt_net:
+#    command: start
+#    state: active
+#    name: test
+#    uri: "{{ libvirt_uri }}"
+
+- name: ensure that the pool is active
+  become: true
+  virt_net:
+    state: active
+    name: default
+    uri: "{{ libvirt_uri }}"
+

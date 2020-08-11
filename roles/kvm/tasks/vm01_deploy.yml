@@ -1,0 +1,45 @@
+---
+- name:  copy-on-write image
+  stat: 
+    path: "{{ image_base_dir }}vm01/{{ image_custom_name }}-seed.qcow2"
+    get_checksum: no 
+  register: vm_stat
+
+- name: cloud-config image 
+  shell: 
+    creates: "{{ image_base_dir }}vm01/cloud-config.img"
+    cmd: >-
+      cloud-localds 
+      -v --network-config={{ image_base_dir }}vm01/network_config_static.cfg
+      {{ image_base_dir }}vm01/{{ image_custom_name }}-seed.qcow2
+      {{ image_base_dir }}vm01/cloud_init.cfg
+  when: vm_stat.stat.exists == false  
+  
+- name:  get vm
+  become: true
+  shell:
+    cmd: virsh list | grep vm01 | awk '{ print $2 }'
+  register: vm_exists
+
+- name: create vm01
+  become: true 
+  shell: 
+    cmd: >- 
+          virt-install 
+          --name vm01
+          --memory 1024 
+          --vcpus cores=1,threads=2 
+          --boot hd,menu=on 
+          --disk path=/var/lib/libvirt/images/vm01/{{image_custom_name}}-seed.qcow2,device=cdrom 
+          --disk path=/var/lib/libvirt/images/snapshot-{{image_custom_name}}.qcow2,device=disk,size=5 
+          --graphics none 
+          --os-type Linux 
+          --network network:default 
+          --noautoconsole
+  when: vm_exists.stdout != host01
+
+- name: start vm
+  become: true
+  virt:
+    name: vm01
+    state: running
