@@ -1,13 +1,13 @@
 ---
 - name:  check seed image status vm02 
   stat: 
-    path: "{{ image_base_dir }}vm01/{{ image_custom_name }}-seed.qcow2"
+    path: "{{ image_base_dir }}vm02/{{ image_custom_name }}-seed.qcow2"
     get_checksum: no 
   register: vm02_stat
 
-- name: cloud-config image vm01
+- name: cloud-config image vm02
   shell: 
-    creates: "{{ image_base_dir }}vm01/cloud-config.img"
+    creates: "{{ image_base_dir }}vm02/cloud-config.img"
     cmd: >-
       cloud-localds 
       -v --network-config={{ image_base_dir }}vm02/network_config_static.cfg
@@ -18,7 +18,7 @@
 - name:  get vm
   become: true
   shell:
-    cmd: virsh list | grep vm02 | awk '{ print $3 }'
+    cmd: virsh list | grep vm02 | awk '{ print $2 }'
   register: vm_exists
 
 - name: create vm02
@@ -29,15 +29,15 @@
           --name vm02
           --memory 1024 
           --cpu host
-          --vcpus cores=2
+          --vcpus cores=4
           --boot hd,menu=on 
-          --disk path=/var/lib/libvirt/images/vm01/{{image_custom_name}}-seed.qcow2,device=cdrom 
-          --disk path=/var/lib/libvirt/images/vm01/snapshot-{{image_custom_name}}.qcow2,device=disk,size=5 
+          --disk path=/var/lib/libvirt/images/vm02/{{image_custom_name}}-seed.qcow2,device=cdrom 
+          --disk path=/var/lib/libvirt/images/vm02/snapshot-{{image_custom_name}}.qcow2,device=disk,size=5 
           --graphics none 
           --os-type Linux 
           --network network:default 
           --noautoconsole
-  when: vm_exists.stdout != host01
+  when: vm_exists.stdout != host02
 
 - name: start vm
   become: true

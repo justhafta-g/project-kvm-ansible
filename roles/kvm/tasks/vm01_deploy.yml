@@ -29,7 +29,7 @@
           --name vm01
           --memory 1024 
           --cpu host
-          --vcpus cores=2
+          --vcpus cores=4
           --boot hd,menu=on 
           --disk path=/var/lib/libvirt/images/vm01/{{image_custom_name}}-seed.qcow2,device=cdrom 
           --disk path=/var/lib/libvirt/images/vm01/snapshot-{{image_custom_name}}.qcow2,device=disk,size=5 
