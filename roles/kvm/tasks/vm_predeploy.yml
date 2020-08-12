@@ -1,8 +1,10 @@
 ---
+#check ubuntu cloud image
 - name: check if ubuntu cloud image exist 
   stat: path={{ image_base_dir }}{{ image_base_name }}
   register: image_base_stat  
 
+#get ubuntu cloud image and store to images
 - name: get ubuntu cloud image if not exist 
   become: true
   get_url:
@@ -10,10 +12,12 @@
     dest: "{{ image_base_dir }}"
   when: image_base_stat.stat.exists == false
 
+#make snapshot of base image 
 - name: get copy of original image
   stat: path=/var/lib/libvirt/images/snapshot-{{image_custom_name}}.qcow2
   register: image_base_name_stat  
 
+  #create snap for vm01
 - name: rename exist base image
   command: qemu-img create -b /var/lib/libvirt/images/bionic-server-cloudimg-amd64.img -f qcow2 /var/lib/libvirt/images/snapshot-{{image_custom_name}}.qcow2 5G
   when: image_base_name_stat.stat.exists == false
@@ -31,7 +35,6 @@
 - name: check folders for vms
   stat: path="{{ item }}"
   register: vm_folder_stat
-  #with_dict: "{{ guests }}"
   with_items: 
   - "{{ vm_folders }}"
 
@@ -52,6 +55,8 @@
   with_items: 
      - { src: 'templates/vm01_cloud-config.yml.j2', dest: "/var/lib/libvirt/images/vm01/cloud_init.cfg" }
      - { src: 'templates/vm01_network-config.yml.j2', dest: "/var/lib/libvirt/images/vm01/network_config_static.cfg" }
+     - { src: 'templates/vm02_cloud-config.yml.j2', dest: "/var/lib/libvirt/images/vm02/cloud_init.cfg" }
+     - { src: 'templates/vm02_network-config.yml.j2', dest: "/var/lib/libvirt/images/vm02/network_config_static.cfg" }
 
 - name: copy images to vms folders 
   copy: 
@@ -69,22 +74,7 @@
       uri: "{{ libvirt_uri }}"
   register: networks
 
-#- name: define a network 
-#  virt_net:
-#    command: define
-#    name: test
-#    xml: '{{ lookup("template", "pool/net.xml.j2") }}'
-#    uri: "{{ libvirt_uri }}"
-
-#building the image pool and starting the image pool, if needed 
-#- name: build network
-#  virt_net:
-#    command: start
-#    state: active
-#    name: test
-#    uri: "{{ libvirt_uri }}"
-
-- name: ensure that the pool is active
+- name: ensure that the network is active
   become: true
   virt_net:
     state: active

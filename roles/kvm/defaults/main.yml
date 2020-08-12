@@ -7,10 +7,9 @@
     image_base_dir: "/var/lib/libvirt/images/"
     image_base_name: "bionic-server-cloudimg-amd64.img"
     image_custom_name: ubnt1804
-    vm_folders: ["{{ image_base_dir }}vm01/"]
-    vm_images: ["{{ image_base_dir }}vm01/{{ image_custom_name }}.qcow2"]
+    vm_folders: ["{{ image_base_dir }}vm01/","{{ image_base_dir }}vm02/"]
+    vm_images: ["{{ image_base_dir }}vm01/snapshot-{{ image_custom_name }}.qcow2","{{ image_base_dir }}vm02/snapshot-{{ image_custom_name }}.qcow2"]
     image_base_url: ["https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img"]
-    #change the uri to "qemu:///system" would execute the virt_pool module as a root even if the remote_user/become_user in ansible is set to a non root user.
     libvirt_uri: "qemu:///system"
     root_pass: "1"
     host01: "vm01"

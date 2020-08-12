@@ -6,3 +6,5 @@
     - { role: common,               tags: [ 'common'  ] }
     - { role: kvm,               tags: [ 'kvm'  ] }
     - { role: kvm,               tags: [ 'vm_predeploy'  ] }
+    - { role: kvm,               tags: [ 'vm01_deploy'  ] }
+    - { role: kvm,               tags: [ 'vm02_deploy'  ] }
