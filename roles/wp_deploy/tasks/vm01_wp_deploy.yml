@@ -1,0 +1,27 @@
+- name: vm01 is starting... wait a sec... go get some coffee   
+  wait_for:
+    port: 22
+    delay: 5
+
+- name: checking for wordpress folder 
+  stat: path="{{ item }}"
+  register: wp_folder_stat
+  with_items: 
+  - "{{ wordpress_base_dir }}"
+
+- name: create wordpress folders for vm01 if not exist
+  become: true
+  file:  
+    path: "{{ item.item }}"
+    state: directory 
+  when: item.stat.exists == false 
+  with_items: 
+  - "{{ wp_folder_stat.results }}" 
+
+- name: template a docker_compose file to vm01 folders
+  become: true
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items: 
+    - { src: 'docker-compose.yaml.j2', dest: "/usr/wordpress/docker-compose.yaml" }

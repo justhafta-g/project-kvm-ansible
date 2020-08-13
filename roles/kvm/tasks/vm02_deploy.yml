@@ -27,9 +27,8 @@
     cmd: >- 
           virt-install 
           --name vm02
-          --memory 1024 
-          --cpu host
-          --vcpus cores=4
+          --memory 1024
+          --vcpus=4
           --boot hd,menu=on 
           --disk path=/var/lib/libvirt/images/vm02/{{image_custom_name}}-seed.qcow2,device=cdrom 
           --disk path=/var/lib/libvirt/images/vm02/snapshot-{{image_custom_name}}.qcow2,device=disk,size=5 

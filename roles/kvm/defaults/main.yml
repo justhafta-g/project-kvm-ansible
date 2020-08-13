@@ -12,6 +12,7 @@
     image_base_url: ["https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img"]
     libvirt_uri: "qemu:///system"
     root_pass: "{{ vault_root_pass }}"
+    pattern_to_match: "Executing: /lib/systemd/systemd-sysv-install enable docker"
     host01: "vm01"
     host02: "vm02"
     images: "images"

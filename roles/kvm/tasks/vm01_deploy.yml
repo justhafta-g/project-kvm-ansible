@@ -27,9 +27,8 @@
     cmd: >- 
           virt-install 
           --name vm01
-          --memory 1024 
-          --cpu host
-          --vcpus cores=4
+          --memory 512
+          --vcpus 4
           --boot hd,menu=on 
           --disk path=/var/lib/libvirt/images/vm01/{{image_custom_name}}-seed.qcow2,device=cdrom 
           --disk path=/var/lib/libvirt/images/vm01/snapshot-{{image_custom_name}}.qcow2,device=disk,size=5 
@@ -38,9 +37,6 @@
           --network network:default 
           --noautoconsole
   when: vm_exists.stdout != host01
+  
 
-- name: start vm
-  become: true
-  virt:
-    name: vm01
-    state: running
+

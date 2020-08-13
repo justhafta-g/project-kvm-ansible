@@ -1,19 +1,21 @@
 #cloud-config
-package_update: true
-hostname: vm01
 
+package_update: true
+package_upgrade: true
+
+hostname: vm01
 manage_etc_hosts: true
+
 users:
   - name: ubuntu
     sudo: ALL=(ALL) NOPASSWD:ALL
-    groups: users, admin
+    groups: users, admin, docker
     home: /home/ubuntu
     shell: /bin/bash
     lock_passwd: false
     ssh-authorized-keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCh1x2+RDAX8aJkIDPK+N0zHuLtIa4GGzYe1SCsad8KKGjda+2VlqMIMOJ3c4ueeFqxMV6HmB/jYh+vORaBt/Ry/2WxDqHj6l1E9/cBGTptV31F0QUlRUNyPTdxDLvaXrvTnOKJd1gMeISgz3K4NdrWQAfNyN9H1sZ0aVhMTKI44/iwflo7IlpbJ8JErwNema6TDqbIMqY9NvXCVRCcaLjUB853Ezvuu0G8Qhe42y8P4aZgs8lFGOI6PsE2hn3NAWw+qTzClCnMBQ1f2lzq7KRKNedetw7oKWtuIJRzCbPN4kOIxsVl+UAf6P4ro/JGRVIPrBZ0EKcBqR1VTKkF4/W1 oleksandrkyktenko@MBPs-Oleksandrs.local
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQbqhEVvHJIdPAv0rbEyx/X8fkKyeF7A2wSeqGrkFCa5kpYZnuvxHCvlHlHwnahXRMCnhzabyky2uVUwvA2Ob2JQ2Le2dNalYI2eqrhd62HqcH13g7dtqEmdbDeQOZusE1GZgnXUoYG8wuPLwWB4exCX/38hTXtEa9uQNODEyy18M5iBATdHvPCRTOaMD7bmBn1zAPI8WL7b7jW8BS6pbzqyZouq3tSSy6joL3THclTzpXk9g8NIY8yD6Ywis5Q0iOFEL1XOJgen8EMTMVJLpWKQCBTn8OYL7dwCcgYeTRatzgrMeLgwbZx5KZ2F6xLLPjWNKjZti9aXm7CtienWyf ubuntu@ubuntu
-# only cert auth via ssh (console access can still login)
+# ssh (console access can still login)
 ssh_pwauth: false
 disable_root: false
 chpasswd:
@@ -21,18 +23,27 @@ chpasswd:
      ubuntu:linux
   expire: False
 
-package_update: true
+ssh_svcname: ssh
+ssh_deletekeys: True
+ssh_genkeytypes: ['rsa', 'ecdsa', 'ed25519']
+
 packages:
-  - qemu-guest-agent
   - apt-transport-https
   - ca-certificates
   - curl
   - gnupg-agent
   - software-properties-common
-bootcmd:
-   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-   - sudo apt-get update
-   - sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+runcmd:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  - curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - apt-get update -y
+  - apt-get -y install docker-ce docker-ce-cli containerd.io
+  - systemctl start docker
+  - systemctl enable docker
+  - chmod +x /usr/local/bin/docker-compose
+  - ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
 # written to /var/log/cloud-init-output.log
 final_message: "The system is finally up, after $UPTIME seconds"

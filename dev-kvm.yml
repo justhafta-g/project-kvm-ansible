@@ -7,4 +7,13 @@
     - { role: kvm,               tags: [ 'kvm'  ] }
     - { role: kvm,               tags: [ 'vm_predeploy'  ] }
     - { role: kvm,               tags: [ 'vm01_deploy'  ] }
-    - { role: kvm,               tags: [ 'vm02_deploy'  ] }
+    #- { role: kvm,               tags: [ 'vm02_deploy'  ] }
+
+
+- hosts: vm01
+  gather_facts: no
+  remote_user: ubuntu
+  become: no
+  roles:
+    - { role: wp_deploy,               tags: [ 'vm01_wp_deploy'  ] }
+    #- { role: wp_deploy,               tags: [ 'vm02_wp_deploy'  ] }

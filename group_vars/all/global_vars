@@ -1,2 +1,7 @@
 ---
-    ansible_user: "root"
+ansible_user: "root"
+wordpress_base_dir: "/usr/wordpress/"
+MYSQL_ROOT_PASSWORD: "{{ vault_MYSQL_ROOT_PASSWORD }}"
+MYSQL_DATABASE: "{{ vault_MYSQL_DATABASE }}"
+MYSQL_USER: "{{ vault_MYSQL_USER }}"
+MYSQL_PASSWORD: "{{ vault_MYSQL_PASSWORD }}"

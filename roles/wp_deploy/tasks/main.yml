@@ -1,0 +1,6 @@
+---
+# tasks file for wp_deploy
+- name: include wordpress deploy on vm01
+  import_tasks: vm01_wp_deploy.yml
+  tags:
+    - vm01_wp_deploy

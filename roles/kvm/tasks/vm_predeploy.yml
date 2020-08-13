@@ -47,6 +47,7 @@
   with_items: 
   - "{{ vm_folder_stat.results }}" 
 
+#check template files to vm dir locations, template iptable script to libvirt 
 - name: template a file to vms folders
   become: true
   template:
@@ -57,6 +58,7 @@
      - { src: 'templates/vm01_network-config.yml.j2', dest: "/var/lib/libvirt/images/vm01/network_config_static.cfg" }
      - { src: 'templates/vm02_cloud-config.yml.j2', dest: "/var/lib/libvirt/images/vm02/cloud_init.cfg" }
      - { src: 'templates/vm02_network-config.yml.j2', dest: "/var/lib/libvirt/images/vm02/network_config_static.cfg" }
+     - { src: 'templates/iptables_ALL.sh.j2', dest: "/var/lib/libvirt/iptables_ALL.sh" }
 
 - name: copy images to vms folders 
   copy: 
@@ -67,6 +69,13 @@
   with_items:
     - "{{ vm_images }}"
 
+- name: ensure that the network is active
+  become: true
+  virt_net:
+    state: active
+    name: default
+    uri: "{{ libvirt_uri }}"
+
 - name: gather info
   become: true 
   virt_net:
@@ -74,10 +83,17 @@
       uri: "{{ libvirt_uri }}"
   register: networks
 
-- name: ensure that the network is active
+#get info about iptable script
+- name: get info iptable roole
+  stat: path=/var/lib/libvirt/iptables_ALL.sh
+  register: image_base_name_stat  
+
+#run iptable script
+- name: set iptable roole if exist
   become: true
-  virt_net:
-    state: active
-    name: default
-    uri: "{{ libvirt_uri }}"
+  shell: /var/lib/libvirt/iptables_ALL.sh
+  args:
+    executable: /bin/bash
+  ignore_errors: true
+  when: image_base_name_stat.stat.exists == true
 
