@@ -22,8 +22,12 @@ There are no any dependencies you need to worry about
 
 Run
 ----------------
-Before you run dev-kvm.yml, set host in inventory file. 
-
+Before you run dev-kvm.yml:
+ 
+ - set host in inventory file
+ - set variables for WordPress/MySQL in vault (see wp_deploy role)
+ - set root password for VMs in vault
+ 
 run role:
 
 ansible-playbook dev-kvm.yml

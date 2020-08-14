@@ -2,7 +2,7 @@
 - name: vm02 is starting... wait a sec... go get some coffee   
   wait_for:
   #change this value for your case
-    timeout: 800
+    timeout: 10
 
 - name: install on vm02 some packeges for docker (pip)
   become: true
