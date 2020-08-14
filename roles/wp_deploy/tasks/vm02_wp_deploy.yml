@@ -1,10 +1,10 @@
 #delay can be replaced with a smaller value for your situation
-- name: vm01 is starting... wait a sec... go get some coffee   
+- name: vm02 is starting... wait a sec... go get some coffee   
   wait_for:
   #change this value for your case
     timeout: 800
-    
-- name: install on vm01 some packeges for docker (pip)
+
+- name: install on vm02 some packeges for docker (pip)
   become: true
   apt:
       state: latest
@@ -27,7 +27,7 @@
   with_items: 
   - "{{ wordpress_base_dir }}"
 
-- name: create wordpress folders for vm01 if not exist
+- name: create wordpress folders for vm02 if not exist
   become: true
   file:  
     path: "{{ item.item }}"
@@ -36,7 +36,7 @@
   with_items: 
   - "{{ wp_folder_stat.results }}" 
 
-- name: template a docker_compose file to vm01 folders
+- name: template a docker_compose file to vm02 folders
   become: true
   template:
     src: "{{ item.src }}"

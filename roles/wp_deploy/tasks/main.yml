@@ -1,6 +1,11 @@
 ---
-# tasks file for wp_deploy
-- name: include wordpress deploy on vm01
+#Install nginx using nginx role 
+- name: Install nginx using nginx role
   import_tasks: vm01_wp_deploy.yml
   tags:
     - vm01_wp_deploy
+
+- name: Install nginx using nginx role
+  import_tasks: vm02_wp_deploy.yml
+  tags:
+    - vm02_wp_deploy

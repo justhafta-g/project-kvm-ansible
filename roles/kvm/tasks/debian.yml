@@ -90,7 +90,6 @@
       state: active
       name: "{{ image_pool_name }}"
       uri: "{{ libvirt_uri }}"
-    #when: ansible_libvirt_pools["{{image_pool_name}}"].state != "active"
 
   #seting the image pool to autostart and ensure that the image pool is active
 - name: autostart the storage pool

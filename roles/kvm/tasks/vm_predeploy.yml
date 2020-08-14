@@ -43,7 +43,6 @@
     path: "{{ item.item }}"
     state: directory 
   when: item.stat.exists == false
-  #with_dict: "{{ guests }}"  
   with_items: 
   - "{{ vm_folder_stat.results }}" 
 
@@ -75,13 +74,6 @@
     state: active
     name: default
     uri: "{{ libvirt_uri }}"
-
-- name: gather info
-  become: true 
-  virt_net:
-      command: info
-      uri: "{{ libvirt_uri }}"
-  register: networks
 
 #get info about iptable script
 - name: get info iptable roole

@@ -1,0 +1,6 @@
+---
+#Install nginx using nginx role 
+- name: include kvm debian
+  import_tasks: loadbalancer.yml
+  tags:
+    - loadbalancer

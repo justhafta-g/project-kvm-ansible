@@ -1,5 +1,5 @@
 ---
-- name:  check seed image status vm02 
+- name:  check seed image status vm02
   stat: 
     path: "{{ image_base_dir }}vm02/{{ image_custom_name }}-seed.qcow2"
     get_checksum: no 
@@ -27,8 +27,8 @@
     cmd: >- 
           virt-install 
           --name vm02
-          --memory 1024
-          --vcpus=4
+          --memory 768
+          --vcpus 8
           --boot hd,menu=on 
           --disk path=/var/lib/libvirt/images/vm02/{{image_custom_name}}-seed.qcow2,device=cdrom 
           --disk path=/var/lib/libvirt/images/vm02/snapshot-{{image_custom_name}}.qcow2,device=disk,size=5 
@@ -37,9 +37,3 @@
           --network network:default 
           --noautoconsole
   when: vm_exists.stdout != host02
-
-- name: start vm
-  become: true
-  virt:
-    name: vm02
-    state: running

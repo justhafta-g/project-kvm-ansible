@@ -1,0 +1,55 @@
+---
+# tasks file for loadbalancer
+#Intsall requirements 
+- name: install tools
+  become: true
+  apt: 
+    name: "{{item}}"
+    state: present 
+    update_cache: yes
+  with_items:
+    - python-httplib2
+
+#Install NGINX
+- name: install nginx
+  become: true
+  apt: 
+    name: nginx 
+    state: present 
+
+#Template config file to /sites-avaliable
+- name: configure nginx state
+  become: true
+  template: 
+    src: nginx.conf.j2 
+    dest: /etc/nginx/sites-available/{{ item.key }} 
+    mode: 0665
+  with_dict: 
+    - "{{ sites }}"
+  notify: restart nginx
+
+#De-activate default nginx site
+- name: de-activate default nginx site
+  become: true
+  file: 
+    path: /etc/nginx/sites-enabled/default 
+    state: absent
+  notify: restart nginx
+
+#Activate wordpress site
+- name: activate wp
+  become: true
+  file: 
+    src: /etc/nginx/sites-available/{{ item.key }} 
+    dest: /etc/nginx/sites-enabled/{{ item.key }} 
+    state: link
+  with_dict: 
+    - "{{ sites }}"
+  notify: restart nginx
+
+- name: ensure nginx started
+  become: true
+  service: 
+    name: nginx 
+    state: started 
+    enabled: yes

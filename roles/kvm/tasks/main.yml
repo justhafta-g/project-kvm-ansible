@@ -15,7 +15,7 @@
   tags:
     - vm01_deploy
 
-#- name: vm02 deploy
- # import_tasks: vm02_deploy.yml
-  #tags:
-  #  - vm02_deploy
+- name: vm02 deploy
+  import_tasks: vm02_deploy.yml
+  tags:
+    - vm02_deploy
