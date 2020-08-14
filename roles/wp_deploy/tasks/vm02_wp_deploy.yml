@@ -1,8 +1,19 @@
 #delay can be replaced with a smaller value for your situation
 - name: vm02 is starting... wait a sec... go get some coffee   
   wait_for:
+    delay: 500
   #change this value for your case
-    timeout: 10
+    timeout: 1000
+    
+- name: Validating if the vm02 is UP and OPENED the PORT
+  wait_for:
+      host: vm02
+      port: 22
+      delay: 30
+      timeout: 60
+      state: started
+      msg: "WebServer PORT is not Listening"
+  ignore_errors: true
 
 - name: install on vm02 some packeges for docker (pip)
   become: true
@@ -44,11 +55,18 @@
   with_items: 
     - { src: 'docker-compose.yaml.j2', dest: "/usr/wordpress/docker-compose.yaml" }
 
+- name:  get containers info (vm02)
+  become: true
+  shell:
+    cmd: docker ps | grep wordpress_db_1 | awk '{ print $12 }'
+  register: cn_exists
+
 - name: Create and start services wp/db
   become: true
   docker_compose:
     project_src: /usr/wordpress/
   register: output
+  when: cn_exists.stdout != containers_check
 
 - debug:
     var: output
