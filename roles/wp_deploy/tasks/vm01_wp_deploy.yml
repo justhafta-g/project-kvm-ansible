@@ -1,9 +1,9 @@
 #delay can be replaced with a smaller value for your situation
-- name: vm01 is starting... wait a sec... go get some coffee   
-  wait_for:
-    delay: 700
-  #change this value for your case
-    timeout: 1000
+#- name: vm01 is starting... wait a sec... go get some coffee   
+#  wait_for:
+#    delay: 700
+#  #change this value for your case
+#   timeout: 1000
     
 - name: Validating if the vm01 is UP and OPENED the PORT
   wait_for:
@@ -12,7 +12,7 @@
       delay: 30
       timeout: 60
       state: started
-      msg: "WebServer PORT is not Listening"
+      msg: "SSH PORT is not Listening"
   ignore_errors: true
 
 - name: install on vm01 some packeges for docker (pip)

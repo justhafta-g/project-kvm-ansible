@@ -37,6 +37,14 @@
           --network network:default 
           --noautoconsole
   when: vm_exists.stdout != host01
+
+- name: vm01 is starting... wait a sec... go get some coffee   
+  wait_for:
+    delay: 750
+  #change this value for your case
+    timeout: 1000
+  ignore_errors: true
+  
   
 
 
