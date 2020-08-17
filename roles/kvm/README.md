@@ -8,7 +8,7 @@ Role Variables
 
 -   libvirt_folder     - define libvirt folder  
 -   image_pool_dir     - define folder to store base image 
--   image_pool_name    - define poll name 
+-   image_pool_name    - define pool name 
 -   image_base_dir     - define dir with base image 
 -   image_base_name    - define name of base image
 -   image_custom_name  - define name of image for deployment
